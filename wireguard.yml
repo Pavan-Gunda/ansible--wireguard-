@@ -1,0 +1,40 @@
+---
+- hosts: wireguard
+  any_errors_fatal: true
+  roles: 
+    - { role: prepare }
+    - { role: wireguard }
+
+    
+- hosts: node-1
+  become: yes
+  tasks:
+   - name: rke install
+     shell: wget https://github.com/rancher/rke/releases/download/v1.0.10/rke_linux-amd64
+
+   - name: changing permission
+     shell: chmod +x rke_linux-amd64
+
+   - name: mv rke 
+     shell: sudo mv rke_linux-amd64 /usr/local/bin/rke
+
+   - name: install kubectl
+     shell: curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+
+   - name: mv kubectl 
+     shell: chmod +x ./kubectl
+ 
+   - name: install kubectl
+     shell: sudo mv ./kubectl /usr/local/bin/kubectl
+
+   - name: rke up 
+     shell: rke up --config="cluster.yml"
+
+   - name: rke up 
+     shell: mkdir ~/.kube
+
+   - name: mv config
+     shell: mv kube_config_cluster.yml config
+
+   - name: mv config file 
+     shell: mv config ~/.kube
